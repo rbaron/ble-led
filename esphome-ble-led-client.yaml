@@ -1,0 +1,40 @@
+esphome:
+  name: esphome_ble_led_client
+  platform: ESP32
+  board: lolin32
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+api:
+  password: !secret home_assistant_api
+
+esp32_ble_tracker:
+  scan_parameters:
+    duration: 30sec
+
+ble_client:
+  - id: esphome_ble_led_ble_client
+    mac_address: D0:90:AB:CD:EF:E2
+    maintain_connection: false
+
+switch:
+  - platform: template
+    name: "ESP32 LED Switch"
+    optimistic: true
+    turn_on_action:
+      - ble_client.ble_write:
+          id: esphome_ble_led_ble_client
+          service_uuid: d7204ebc-4bc5-4a6a-a7e5-7a86f998b7a9
+          characteristic_uuid: 9be42785-94ae-4c1b-aa02-cd87c1c647c8
+          value: [0x7f, 0xab]
+    turn_off_action:
+      - ble_client.ble_write:
+          id: esphome_ble_led_ble_client
+          service_uuid: d7204ebc-4bc5-4a6a-a7e5-7a86f998b7a9
+          characteristic_uuid: 9be42785-94ae-4c1b-aa02-cd87c1c647c8
+          value: [0x4b, 0x9d]
+
+logger:
+  level: DEBUG
